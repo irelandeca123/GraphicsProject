@@ -1,29 +1,85 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 <html>
+
   <head>
-    
-    <style type="text/css"></style>
+    <meta charset="UTF-8">
+    <title>GAME</title>
+
+    <style type="text/css">
+
+    </style>
+
   </head>
+
   <body>
-  
-		<canvas id="gamecanvas"></canvas>   
+
+    <canvas id="canvas"></canvas>
+
     <script type="text/javascript">
+
+	var canvas = document.getElementById("canvas"),
+	ctx = canvas.getContext("2d");
+	canvas.width = 512;
+	canvas.height = 480;
+
+	var background = new Image();
+	background.src = "images/background.png";
+
+	 	 // Make the fill style red.
+      ctx.fillStyle = "rgb(255, 0, 0)";
+      
+      var ball = {
+        x: canvas.width / 2
+        , y: canvas.height / 2
+        , r: 17
+      }
+      
+		
+		function drawCircle() {
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.r, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+			
+
+			
+	// Make sure the image is loaded first otherwise nothing will draw.
+	background.onload = function(){
+	ctx.drawImage(background,0,0);
+    drawCircle();
+	}
+
+
+      
+
+	      // Add an event listener to the keypress event.
+      window.addEventListener("keydown", function(event) { 
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        if (event.keyCode == 39 && ball.x < canvas.width - ball.r)
+          ball.x += Math.min(5, canvas.width - ball.x - ball.r);
+        else if (event.keyCode == 37 && ball.x > ball.r)
+          ball.x -= 5;
+        else if (event.keyCode == 40 && ball.y < canvas.height - ball.r)
+          ball.y += 5;
+        else if (event.keyCode == 38 && ball.y > ball.r)
+          ball.y -= 5;
+        background.onload();
+        drawCircle();
+      });
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		
     </script>
   </body>
 </html>
-=======
-<!DOCTYPE html>
-<html>
-  <head>
-    ...
-    <style type="text/css"></style>
-  </head>
-  <body>
-    ...
-    <script type="text/javascript">
-      ...
-    </script>
-  </body>
-</html>
->>>>>>> cf7fa1766114ccd1b7dd705004545f3d56f6c2a3
