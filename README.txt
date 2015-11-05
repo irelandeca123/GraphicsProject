@@ -1,7 +1,15 @@
-Game information
-===================
+Game Info: 
+=============
+Move With Arrow Keys 
 
-1. If user gets 5 points or over another zombie spawns (Level 2)
-2. Apples gain points and disapear every 10 seconds
-3. User is given 5 lives and the game will reset automatically after the 5 lives have ended
-4.
+Collect as many apples as possible
+
+Zombies lower the lives & hero speed 
+
+Apples = Points and Speed
+
+Cola = Adds one live 
+
+Kit = Recovers speed 
+
+Zombies Spawn far away at beggining on purpose

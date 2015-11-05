@@ -3,57 +3,61 @@
 
   <head>
     <meta charset="UTF-8">
-    <title>GAME</title>
+    <title>Zombie Survivor</title>
 
     <style type="text/css">
 
+h2{
+	 position: absolute;
+    left: 1000px;
+}
     </style>
 
   </head>
 
   <body>
 
-  
+	<h2><br> <u> Game Info: </u></br>
+	<br>Move With Arrow Keys </br>
+	<br>Collect as many apples as possible<br>
+	<br> Zombies lower the lives & hero speed </br>
+	<br> Apples = Points and Speed</br>
+	<br> Cola = Adds one live </br>
+	<br> Kit = Recovers speed </br>
+	</h2>
   
     <canvas id="canvas"></canvas>
 
-	
-    <script type="text/javascript">
 
-	var seconds = 10000;
-	var myVar = setInterval(function(){ myTimer() }, seconds);
-
-	function myTimer() {
-		
-		reset();
-	}
-
-	function myStopFunction() {
-	clearInterval(myVar);
-	}
+    <script  align="left" type="text/javascript">	
 	
 	var canvas = document.getElementById("canvas"),
 	ctx = canvas.getContext("2d");
+	
+	//set canvas width and height 
 	canvas.width = 969;
 	canvas.height = 710;
 
+	//creates background image and source
 	var background = new Image();
 	background.src = "images/background.png";
 	 
+	 
 	var x = 450,  //initial x
-    y = 300,  // initial y
-    velY = 0,
-    velX = 0,
+    y = 300,	// initial y
+    velY = 0, //velocity y
+    velX = 0, //velocity x
     speed = 2, // max speed
     friction = 0.8, // friction
-    keys = [];	  
+    keys = [];	 //to be used for keys
 	
-	var zombieX = 50;
-	var zombieY = 600;
-	var zombie2X = 20;
-	var zombie2Y = 300;
-	var rockX=660;
-	var rockY=145;
+	//zombie x and y position
+	var zombieX = 10;  
+	var zombieY = 100; 
+	
+	//zombie 2 x and y position
+	var zombie2X = 10;
+	var zombie2Y = 1000;
 		 
 	  // Hero image
 		var heroImage = new Image();
@@ -68,7 +72,10 @@
 		foodReady = true;
 		};
 		foodImage.src = "images/food.png";		
-	  
+		
+		//variables
+		var cola = {};
+		var kit = {};
 		var food = {};
 		var foodCaught = 0;
 		var lives = 5;
@@ -85,31 +92,58 @@
 		zombie2Image.onload = function () {
 		zombie2Ready = true;
 		};
-		zombie2Image.src = "images/zombie1.png";  	
+		zombie2Image.src = "images/zombie1.png";  
+
 		
-		//Rock
-		var rockImage = new Image();
-		rockImage.onload = function () {
-		rockReady = true;
+		//Kit image
+		var kitImage = new Image();
+		kitImage.onload = function () {
+		kitReady = true;
 		};
-		rockImage.src = "images/rock1.png";  	
-							
-	// Make sure the image is loaded first otherwise nothing will draw.
+		kitImage.src = "images/kit.png";
+			
+		//Cola image
+		var colaImage = new Image();
+		colaImage.onload = function () {
+		colaReady = true;
+		};
+		colaImage.src = "images/speed.png";	
+		
+		//import sounds 
+		var snd = new Audio("sound/laser2.wav"); // buffers automatically when created		
+		var snd2 = new Audio("sound/apple.wav"); // buffers automatically when created						
+		var snd3 = new Audio("sound/gameover.wav"); // buffers automatically when created	
+		var snd4 = new Audio("sound/drink.wav"); // buffers automatically when created	
+		var snd5 = new Audio("sound/collect.wav"); // buffers automatically when created				
+		
+	//to check for speed and draw if true
+	function checkSpeed() {
+	if (speed < 2.0){
+	ctx.drawImage(kitImage,kit.x, kit.y);
+	}}
+	
+	//to check for lives and draw if true
+	 function checkLives() {
+	if (lives < 3){
+	ctx.drawImage(colaImage,cola.x, cola.y);
+	}}
+	
+	//load background
 	background.onload = function(){
 	ctx.drawImage(background,0,0);
 	ctx.drawImage(heroImage,x, y);
-	ctx.drawImage(foodImage,food.x,food.y);	
+	ctx.drawImage(foodImage,food.x,food.y);		
 	ctx.drawImage(zombieImage,zombieX, zombieY);
-	ctx.drawImage(rockImage,650, 150);
-	if (foodCaught == 5 || foodCaught > 5){	
-	ctx.drawImage(zombie2Image,zombie2X,zombie2Y);
-	}				
+	ctx.drawImage(zombie2Image,zombie2X,zombie2Y);	
+	checkSpeed();
+	checkLives();
+	
 	// Score
 	ctx.fillStyle = "blue";
 	ctx.font = "24px Impact";
 	ctx.textAlign = "left";
 	ctx.textBaseline = "top";
-	ctx.fillText("POINTS: " + foodCaught, 32, 32);
+	ctx.fillText("Score: " + foodCaught, 32, 32);
 		
 	ctx.fillStyle = "red";
 	ctx.font = "24px Impact";
@@ -119,7 +153,6 @@
 	}
 	  	  	  
 	function update() {
-    // check the keys and do the movement.
    background.onload();
    health();
    // check the keys and do the movement.
@@ -153,68 +186,79 @@
     // apply some friction to x velocity.
     velX *= friction;
     x += velX;
-		
-	zombieEvents();	
-	
-		// Hero and food touching
+				
+	// Hero and food touching
 	if (
 		x <= (food.x + 32)
 		&& food.x <= (x + 32)
 		&& y <= (food.y + 32)
 		&& food.y <= (y + 32)
 	) {
+		snd2.play();
 		++foodCaught;
-		reset();
+		resetApples();
 	}	
 
+	// Hero and kit touching
+	if (
+		x <= (kit.x + 32)
+		&& kit.x <= (x + 32)
+		&& y <= (kit.y + 32)
+		&& kit.y <= (y + 32)
+		&& (speed < 2.0)
+	) {
+		snd5.play();
+		speed += 0.25;
+		resetKit();
+	}	
+	
+	
+	
+	// Hero and cola touching
+	if (
+		x <= (cola.x + 32)
+		&& cola.x <= (x + 32)
+		&& y <= (cola.y + 32)
+		&& cola.y <= (y + 32)
+		&& (lives < 3)
+	) {
+		snd4.play();
+		lives += 1;
+		speed += 0.5;
+		resetCola();		
+	}	
+	
+		//if zombie touches hero
 		if (zombieX <= x) {
 		zombieX++;
 		}else if (zombieX >= x){
 		zombieX--;
 		}
 		
+		//if zombie touches hero
 		if(zombieY<=y){
 		zombieY++;
 		}else if (zombieY>=y){
 		zombieY--;}		
 
+		//if zombie 2 touches hero
 		if (zombie2X <= x) {
 		zombie2X++;
 		}else if (zombie2X >= x){
 		zombie2X--;
 		}
 		
+		//if zombie 2 touches hero
 		if(zombie2Y <=y){
 		zombie2Y++;
 		}else if (zombie2Y>=y){
 		zombie2Y--;}	
-			
-		/*
-		//rock collision
-		if (x >= rockX 
-		&& y >= rockY 
-		&& y <= rockY + rockImage.height)
-		{
-		x = rockX - heroImage.width;	
-		//y = rockY - heroImage.height;
-		} */
-
-if (x >= rockX-45 && x <= rockX+45
-           && y >= rockY && y <= rockY + rockImage.height)
-        {
-		  x = rockX-45;
-	    }
-
-
-
-
-
-
 		
+		zombieEvents();	
 	 } 
 	  
-update();
 
+	// zombie events 
  function zombieEvents() {
 	
 	if (x >= 910) {
@@ -236,22 +280,26 @@ update();
 		&& y <= (zombieY + 32)
 		&& zombieY <= (y + 32)
 	) {
+		snd.play();
 		lives --;
+		speed -=0.5;
 		resetZombie(); 		
 	}
 	
-	 		// Zombie2 And Hero Touching
+	 // Zombie2 And Hero Touching
 	if (
 		x <= (zombie2X + 32)
 		&& zombie2X <= (x + 32)
 		&& y <= (zombie2Y + 32)
 		&& zombie2Y <= (y + 32)
 	) {
+		snd.play();
 		lives --;
+		speed -=0.25;
 		resetZombie(); 		
 	}
 	
-		 // Zombie2 And Zombie1 touching move one away
+	// Zombie2 And Zombie1 touching move one away
 	if (
 		zombieX <= (zombie2X + 32)
 		&& zombie2X <= (zombieX + 32)
@@ -260,15 +308,15 @@ update();
 	) {
 		zombieY--;
 		zombieX--;		 		
-	}	
+	}		
  }
 
- 
+
  function health() {
  if (lives <= 0){
-lives = 5;
-var then = Date.now();
-reset();
+ snd3.play();
+ //sleep(1000);
+ stopImmediatePropagation();
 	}  
  }
 
@@ -280,12 +328,24 @@ document.body.addEventListener("keyup", function (e) {
     keys[e.keyCode] = false;
 });	  
 	    	  
-	  var reset = function () {	 
+	var resetApples = function () {	 
 
 	// Throw the apple somewhere on the screen randomly
 	food.x = 32 + (Math.random() * (900 - 64));
 	food.y = 32 + (Math.random() * (600 - 64));
+
 	};
+	
+	var resetKit = function () {	
+	kit.x = 32 + (Math.random() * (900 - 64));
+	kit.y = 32 + (Math.random() * (600 - 64));	
+	};
+	
+	var resetCola = function () {	 	
+	cola.x = 32 + (Math.random() * (900 - 64));
+	cola.y = 32 + (Math.random() * (600 - 64));
+	};
+	
 	  	  var resetZombie = function () {	 
 	// Throw the zombie somewhere on the screen randomly
 	zombieX = 32 + (Math.random() * (900 - 64));
@@ -316,7 +376,9 @@ requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame
 
 // Let's play this game!
 var then = Date.now();
-reset();
+resetApples();
+resetKit();
+resetCola();
 main();
 
     </script>
