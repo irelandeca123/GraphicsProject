@@ -1,5 +1,0 @@
-if (x >= rockX-45 && x <= rockX+45
-           && y >= rockY && y <= rockY + rockImage.height)
-        {
-		  x = rockX-45;
-	    }
